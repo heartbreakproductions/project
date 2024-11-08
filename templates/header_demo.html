@@ -1,0 +1,40 @@
+<nav>
+    <a href="/">Home</a>
+    <a href="{% url 'posts:post_list' %}">Posts</a>
+    <a href="{% url 'blog:blog_list' %}">Blog</a>
+    <a href="{% url 'groups:list' %}">Groups</a>
+    
+    <a href="{% url 'services:services_list' %}">Services</a>
+    {% comment %} <a href="{% url 'premium:page' %}">Premium</a> {% endcomment %}
+    <a href="{% url 'jobs:job_list' %}">Jobs</a>
+
+    <a href="{% url 'donate_page' %}">Donate</a>
+    <a href="{% url 'about_page' %}">About</a>
+
+
+    <a href="/admin">Admin</a>
+
+
+
+    {% if user.is_authenticated %}
+        <a href="{% url 'profile_view' %}">Profile</a>
+
+        <a href="{% url 'notification_list' %}">
+            Notifications {% if request.user.is_authenticated and request.user.notifications.filter(read=False).count > 0 %}
+              ({{ request.user.notifications.filter(read=False).count }})
+            {% endif %}
+          </a>
+
+        <form action="{% url 'logout' %}" method="post" style="display: inline; ">
+            {% csrf_token %}
+            <button type="submit">Log out</button>
+        </form>
+
+    {% else %}
+    <a href="{% url 'register' %}">Sign up</a>
+    <a href="{% url 'login' %}">Log in</a>
+    {% endif %}
+    
+    
+</nav> 
+

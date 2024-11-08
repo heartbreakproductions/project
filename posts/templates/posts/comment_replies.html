@@ -1,0 +1,19 @@
+{% for reply in comment.replies.all %}
+    <div class="pt-3 w-full">
+        <p><strong>{{ reply.user.username }}</strong>: {{ reply.content }}</p>
+        {% comment %} <p><small>{{ reply.created_at }}</small></p> {% endcomment %}
+
+        <!-- Allow reply only if logged in -->
+        {% comment %} <a href="{% url 'posts:add_comment_reply' post.id reply.id %}">Reply</a> {% endcomment %}
+        {% comment %} <a href="{% url 'posts:add_comment' post.id comment.id %}?username={{ comment.user.username }}">Reply</a> {% endcomment %}
+        <a href="{% url 'posts:add_comment_reply' post.id comment.id %}">Reply</a>
+
+        <!-- Show delete link only if the logged-in user is the reply author -->
+        {% if reply.user == request.user %}
+            | <a href="{% url 'posts:delete_comment' reply.id %}">Delete</a>
+        {% endif %}
+
+        <!-- If this reply has its own replies, display them recursively -->
+        {% include 'posts/comment_replies.html' with comment=reply %}
+    </div>
+{% endfor %}

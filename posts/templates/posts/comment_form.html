@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+<div class="max-w-md mx-auto p-3 bg-white shadow-md">
+    <!-- Heading -->
+    <h1 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 text-center">Comment on "{{ post.title }}"</h1>
+    
+    <!-- Parent Comment (if replying) -->
+    {% if parent_comment %}
+    <p class="mb-3 p-3 bg-gray-100 rounded text-sm text-gray-700">
+        <strong>Replying to {{ parent_comment.user.username }}</strong>: "{{ parent_comment.content }}"
+    </p>
+    {% endif %}
+    
+    <!-- Comment Form -->
+    <form method="post" class="space-y-2">
+        {% csrf_token %}
+        
+        {% for field in form %}
+            <div class="space-y-1">
+                <label for="{{ field.id_for_label }}" class="block text-gray-700 font-medium">{{ field.label }}</label>
+                {{ field|add_class:"w-full border border-gray-300 p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+                {% if field.help_text %}
+                    <p class="text-xs text-gray-500">{{ field.help_text }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+        
+        <!-- Submit Button -->
+        <button type="submit" class="w-full py-2  border shadow active:bg-gray-200">
+            Submit
+        </button>
+    </form>
+
+    <!-- Back to Post Link -->
+    {% comment %} <div class="mt-4 text-center">
+        <a href="{% url 'posts:post_detail' post.id %}" class="text-blue-600 underline hover:text-blue-700">Back to Post</a>
+    </div> {% endcomment %}
+</div>
+
+{% endblock content %}

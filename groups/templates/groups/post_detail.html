@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl p-3 bg-white rounded shadow-md ">
+    <!-- Post Title and Body -->
+    <h1 class="text-2xl font-semibold text-gray-800 mb-4">{{ post.title }}</h1>
+    <p class="text-gray-700 mb-4">{{ post.body }}</p>
+
+    <!-- Post Metadata -->
+    <p class="text-sm text-gray-500 mb-4">
+        Posted by <span class="font-medium">{{ post.author.username }}</span> on {{ post.created_at|date:"Y-m-d H:i" }}
+    </p>
+
+    <!-- Voting Section -->
+    {% comment %} <div class="flex items-center space-x-4 mb-6">
+        <p class="text-green-600 font-semibold">Upvotes: </p>
+        <p class="text-red-600 font-semibold">Downvotes: </p>
+    </div> {% endcomment %}
+    
+    <div class="flex space-x-4 mb-6">
+        <!-- Upvote Button -->
+        <form action="{% url 'groups:upvote_post' post.id %}" method="post" class="inline">
+            {% csrf_token %}
+            <button type="submit" 
+                    class="px-4 py-2 border focus:outline-none{% if user_vote and user_vote.vote_type == 'upvote' %}opacity-50 cursor-not-allowed{% endif %}"
+                    {% if user_vote and user_vote.vote_type == 'upvote' %}disabled{% endif %}>
+                Upvote {{ post.upvotes }}
+            </button>
+        </form>
+
+        <!-- Downvote Button -->
+        <form action="{% url 'groups:downvote_post' post.id %}" method="post" class="inline">
+            {% csrf_token %}
+            <button type="submit" 
+                    class="px-4 py-2 border focus:outline-none {% if user_vote and user_vote.vote_type == 'downvote' %}opacity-50 cursor-not-allowed{% endif %}"
+                    {% if user_vote and user_vote.vote_type == 'downvote' %}disabled{% endif %}>
+                Downvote {{ post.downvotes }}
+            </button>
+        </form>
+    </div>
+
+    <!-- Comments Section -->
+    <h2 class="text-xl font-semibold text-gray-800 mb-2">Comments</h2>
+    <div class="mb-4">
+        <a href="{% url 'groups:add_comment' post.id %}" class="border px-2 py-1">Add a Comment</a>
+    </div>
+
+
+    {% comment %} {% if comments %}
+        <div class="space-y-4">
+            {% for comment in comments %}
+            <div class="p-2 bg-gray-100 shadow-sm">
+
+                {% include 'groups/comment_item.html' with comment=comment %}
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-gray-600">No comments yet. Be the first to comment!</p>
+    {% endif %} {% endcomment %}
+
+    <div class="py-3">
+        {% for comment in top_level_comments %}
+            <div class="mt-3 p-3 bg-gray-100 shadow-sm text-sm">
+                <div>
+                    <strong>{{ comment.user.username }}</strong>:
+                    {% with comment.content as content %}
+                        {% for word in content.split %}
+                            {% if word|slice:":1" == "@" %}
+                                <span class="text-blue-500 font-bold">{{ word }}</span>
+                            {% else %}
+                                {{ word }}
+                            {% endif %}
+                        {% endfor %}
+                    {% endwith %}
+                </div>
+                {% comment %} <a href="{% url 'groups:add_comment_reply' post.id comment.id %}">Reply</a> {% endcomment %}
+                <a href="{% url 'groups:add_comment_reply' post.id comment.id %}">Reply</a>
+                {% if comment.user == request.user %}
+                    | <a href="{% url 'groups:delete_comment' comment.id %}">Delete</a>
+                {% endif %}
+                <div class="pl-7 w-full">
+                    {% comment %} {% include 'groups/comment_replies.html' with comment=comment %} {% endcomment %}
+                    {% include 'groups/comment_replies.html' with comment=comment post=post %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    
+</div>
+{% endblock content %}

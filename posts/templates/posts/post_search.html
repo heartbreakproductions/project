@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- post_search.html -->
+
+<h2>Search Results for "{{ query }}"</h2>
+<a href='{% url "posts:post_list" %}'>Back to all posts</a>
+
+{% if results %}
+    <div>
+        {% for post in results %}
+            <div>
+                <a href="{% url 'posts:post_detail' post.id %}">{{ post.title }}</a>
+                <p>{{ post.body|truncatewords:20 }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No posts found.</p>
+{% endif %}
+
+
+
+{% endblock content %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <h2 class="text-xl font-semibold text-gray-800 mb-2">Notifications</h2>
+
+    <ul class="bg-white shadow-lg divide-y divide-gray-200">
+        {% for notification in notifications %}
+            <li class="p-4 {% if not notification.read %}bg-gray-100{% endif %}">
+                <div class="flex items-center justify-between space-x-2">
+                    <div class="text-gray-700">
+                        {% if notification.notification_type == 'upvote' %}
+                            <a href="{% url 'posts:post_detail' post_id=notification.post.id %}" class="">
+                                {{ notification.post.title }} has been upvoted
+                            </a>
+                        {% elif notification.notification_type == 'comment' %}
+                            <a href="{% url 'posts:post_detail' post_id=notification.post.id %}" class="">
+                                New comment on your post: {{ notification.post.title }} by {{ notification.comment.user.username }}
+                            </a>
+                        {% elif notification.notification_type == 'reply' %}
+                            <a href="{% url 'posts:post_detail' post_id=notification.post.id %}" class="">
+                                {{ notification.comment.user.username }} replied to your comment on '{{ notification.post.title }}'
+                            </a>
+                        {% elif notification.notification_type == 'new_blog' %}
+                            <a href="{% url 'read_notification' notification.id %}" class="">
+                                New Blog: {{ notification.blog.title }}
+                            </a>
+                        {% elif notification.notification_type == 'group_post' %}
+                            <a href="{% url 'groups:post_detail' post_id=notification.group_post.id %}" class="">
+                                New Post in Group: {{ notification.group_post.group.name }} - {{ notification.group_post.title }}
+                            </a>
+                        {% elif notification.notification_type == 'group_comment' %}
+                            <a href="{% url 'groups:post_detail' post_id=notification.group_post.id %}" class="">
+                                Comment on Post in Group: {{ notification.group_post.group.name }} - {{ notification.group_post.title }}
+                            </a>
+                        {% elif notification.notification_type == 'group_comment_reply' %}
+                            <a href="{% url 'groups:post_detail' post_id=notification.group_post.id %}" class="">
+                                Reply on Post in Group: {{ notification.group_post.group.name }} - {{ notification.group_post.title }}
+                            </a>
+                        {% endif %}
+                    </div>
+                    {% comment %} <div class="flex items-center space-x-2">
+                        {% if not notification.read %}
+                            <span class="text-sm text-red-500 font-medium">(Unread)</span>
+                        {% else %}
+                            <span class="text-sm text-green-500 font-medium">(Read)</span>
+                        {% endif %}
+                    </div> {% endcomment %}
+                </div>
+                <div class="mt-2 flex space-x-4">
+                    <a href="{% url 'read_notification' notification.id %}" class="text-sm">Mark as Read</a>
+                    <a href="{% url 'delete_notification' notification.id %}" class="text-sm text-red-600 ">Delete</a>
+                </div>
+            </li>
+        {% empty %}
+            <li class="p-4 text-gray-600">No notifications.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

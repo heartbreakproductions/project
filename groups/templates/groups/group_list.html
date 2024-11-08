@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form method="GET" action="{% url 'groups:list' %}" class="flex gap-2 mb-2">
+    <input type="text" name="q" placeholder="Search groups..." value="{{ request.GET.q }}" 
+           class="w-full border px-2 py-1">
+    <button type="submit" class="border px-2 py-1">
+        Search
+    </button>
+</form>
+
+    <div class="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0">
+
+        <div class=" text-center w-full">
+            <select id="groupFilter" name="sort" class="mt-1 pb-1 block w-full border-gray-300 shadow-sm focus:border-none text-gray-700">
+                <option>Filter Groups</option>
+                <option data-url="?sort_by=recent">Recently Created</option>
+                <option data-url="?sort_by=most_joined">Most Joined</option>
+            </select>
+        </div>
+
+
+        <a href="{% url 'groups:create' %}" class=" py-2 px-4 shadow border w-full text-center">
+            Create New Group
+        </a>
+        
+
+        
+    </div>
+
+    
+
+    <div class="space-y-4 mt-4">
+        {% for group in groups %}
+            <div class="border-b pb-2">
+                <a href="{% url 'groups:group_detail' group.id %}" class="text-lg text-gray-800">{{ group.name }}</a>
+                <div class="text-sm text-gray-600">{{ group.members.count }} users joined</div>
+            </div>
+        {% empty %}
+            <li class="text-gray-600">No groups available.</li>
+        {% endfor %}
+    </div>
+
+    <div class="mt-4 flex justify-between items-center text-sm">
+        <div class="flex space-x-2">
+            {% if groups.has_previous %}
+                <a href="?page=1&sort_by={{ sort_by }}&q={{ request.GET.q }}" class="text-blue-500 hover:text-blue-600">&laquo; First</a>
+                <a href="?page={{ groups.previous_page_number }}&sort_by={{ sort_by }}&q={{ request.GET.q }}" class="text-blue-500 hover:text-blue-600">Previous</a>
+            {% else %}
+                <span class="text-gray-400">&laquo; First</span>
+                <span class="text-gray-400">Previous</span>
+            {% endif %}
+        </div>
+
+        <p class="font-semibold">Page {{ groups.number }} of {{ groups.paginator.num_pages }}</p>
+
+        <div class="flex space-x-2">
+            {% if groups.has_next %}
+                <a href="?page={{ groups.next_page_number }}&sort_by={{ sort_by }}&q={{ request.GET.q }}" class="text-blue-500 hover:text-blue-600">Next</a>
+                <a href="?page={{ groups.paginator.num_pages }}&sort_by={{ sort_by }}&q={{ request.GET.q }}" class="text-blue-500 hover:text-blue-600">Last &raquo;</a>
+            {% else %}
+                <span class="text-gray-400">Next</span>
+                <span class="text-gray-400">Last &raquo;</span>
+            {% endif %}
+        </div>
+    </div>
+
+<script>
+    $(document).ready(function() {
+        $('#groupFilter').on('change', function() {
+            const url = $(this).find(':selected').data('url');
+            if (url) {
+                window.location.href = url;
+            }
+        });
+    });
+</script>
+
+
+{% endblock content %}

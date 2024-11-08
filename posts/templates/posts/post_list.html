@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="">
+
+    <!-- Search Section -->
+    <form action="{% url 'posts:post_search' %}" method="get" class="flex gap-2 mt-2">
+        <input type="text" name="q" placeholder="Search posts..." class="w-full px-2 py-1 border shadow-sm" />
+        <button type="submit" class="bg-white border px-2 py-1 shadow-sm">Search</button>
+    </form>
+
+
+    <div class="mt-2 text-center ">
+        <select id="postFilter" name="sort" class="mt-1 pb-1 block w-full border-gray-300 shadow-sm focus:border-none text-gray-700">
+            <option>Filter Posts</option>
+            <option data-url="{% url 'posts:post_list' %}">Most Recent</option>
+            <option data-url="?sort=most_commented">Most Commented</option>
+            <option data-url="?sort=most_upvotes">Most Upvoted</option>
+            <option data-url="?sort=most_downvotes">Most Downvoted</option>
+        </select>
+    </div>
+    
+    <!-- Filter Section -->
+    {% comment %} <div class="mt-2 text-center">
+        <select id="postFilter" name="sort" class="mt-1 w-full border-gray-300 shadow-sm text-gray-700">
+            <option>Most Recent</option>
+            <option>Most Commented</option>
+            <option>Most Upvoted</option>
+            <option>Most Downvoted</option>
+        </select>
+    </div> {% endcomment %}
+
+    
+
+    <!-- Filter Section -->
+    {% comment %} <h3 class=" mt-2">Filter Posts</h3> {% endcomment %}
+    {% comment %} <div class="flex flex-wrap gap-2 mt-2 text-blue-700 py-2 justify-center">
+        <a href="?sort=most_commented" class="underline">Most Commented</a>
+        <a href="?sort=most_upvotes" class="underline">Most Upvoted</a>
+        <a href="?sort=most_downvotes" class="underline">Most Downvoted</a>
+        <a href="{% url 'posts:post_list' %}" class="underline">Most Recent</a>
+    </div> {% endcomment %}
+
+    <a href="{% url 'posts:post_create' %}" class="shadow-md mt-4 border bg-white px-4 py-2 mb-2 inline-block w-full text-center">Create Post</a>
+
+
+    <!-- Posts Section -->
+    <div class="space-y-4">
+        {% for post in posts %}
+            <div class="bg-white p-4 shadow-md border">
+                <h2 class="text-xl font-bold">
+                    <a href="{% url 'posts:post_detail' post.id %}" class="">{{ post.title }}</a>
+                </h2>
+                {% if post.image %}
+                <div class="h-[180px] w-full">
+
+                    <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full mt-2 h-full object-cover" />
+                </div>
+                {% endif %}
+
+                <div class="text-gray-600 mt-2 flex text-sm space-x-2">
+                    {% comment %} <p>Upvotes: {{ post.num_upvotes }}</p>
+                    <p>Downvotes: {{ post.num_downvotes }}</p> {% endcomment %}
+                    <p>Comments: {{ post.num_comments }}</p>
+                </div>
+
+                {% if user.is_authenticated %}
+                    <form action="{% url 'posts:vote_post' post.id %}" method="post" class="flex gap-2 mt-3">
+                        {% csrf_token %}
+                        <button type="submit" name="vote_type" value="upvote" class="border px-4 py-1 active:bg-gray-200">
+                            <i class="bi bi-arrow-up-short"></i>
+                            <span>{{ post.num_upvotes }}</span>
+                        </button>
+                        <button type="submit" name="vote_type" value="downvote" class="border px-4 py-1 active:bg-gray-200">
+                            <i class="bi bi-arrow-down-short"></i>
+                            <span>{{ post.num_downvotes }}</span>
+                        </button>
+                    </form>
+                {% else %}
+                    <p class="text-gray-500 mt-3">You must be logged in to vote. <a href="{% url 'login' %}" class="text-blue-600 underline">Login</a></p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    {% comment %} <!-- Pagination Controls -->
+    <div class="mx-auto flex justify-between items-center mt-6">
+        {% if posts.has_previous %}
+            <a href="?page=1{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="text-blue-600 underline">First</a>
+            <a href="?page={{ posts.previous_page_number }}{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="text-blue-600 underline">Previous</a>
+        {% endif %}
+
+        <span>Page {{ posts.number }} of {{ posts.paginator.num_pages }}</span>
+
+        {% if posts.has_next %}
+            <a href="?page={{ posts.next_page_number }}{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="text-blue-600 underline">Next</a>
+            <a href="?page={{ posts.paginator.num_pages }}{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="text-blue-600 underline">Last</a>
+        {% endif %}
+    </div> {% endcomment %}
+
+    <!-- Pagination Controls -->
+    <div class="mt-4 flex justify-between items-center text-sm">
+        {% if posts.has_previous %}
+            <a href="?page=1{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="text-red-700">&laquo; First</a>
+            <a href="?page={{ posts.previous_page_number }}{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="text-red-700">Previous</a>
+        {% else %}
+            <span class="text-gray-400">&laquo; First</span>
+            <span class="text-gray-400">Previous</span>
+        {% endif %}
+    
+        <span class="text-gray-700 font-semibold">
+            Page {{ posts.number }} of {{ posts.paginator.num_pages }}
+        </span>
+    
+        {% if posts.has_next %}
+            <a href="?page={{ posts.next_page_number }}{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="text-red-700 ">Next</a>
+            <a href="?page={{ posts.paginator.num_pages }}{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="text-red-700">Last &raquo;</a>
+        {% else %}
+            <span class="text-gray-400">Next</span>
+            <span class="text-gray-400">Last &raquo;</span>
+        {% endif %}
+    </div>
+    
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#postFilter').on('change', function() {
+            const selectedOption = $(this).find('option:selected'); // Get selected option
+            const redirectUrl = selectedOption.data('url'); // Fetch URL from data attribute
+            window.location.href = redirectUrl; // Redirect to selected URL
+        });
+    });
+</script>
+
+
+{% endblock content %}

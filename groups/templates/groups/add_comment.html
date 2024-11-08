@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto p-3 bg-white  shadow-md ">
+    <h1 class="text-xl text-gray-800 mb-4">Comment on "{{ post.title }}"</h1>
+
+    {% if parent_comment %}
+    <p class="text-sm text-gray-600 mb-4">Replying to: <strong>{{ parent_comment.user.username }}</strong> - "{{ parent_comment.content }}"</p>
+    {% endif %}
+
+    <!-- Comment Form -->
+    <form method="post" onsubmit="return preventMultipleSubmissions();">
+        {% csrf_token %}
+        
+        <div class="mb-4">
+            {{ form.content|add_class:"block w-full p-3 border border-gray-300  shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+        </div>
+        
+        <button type="submit" id="submitBtn" 
+                class="w-full py-2 px-4 border active:bg-gray-200  focus:outline-none" 
+                >
+            Submit
+        </button>
+    </form>
+
+    {% comment %} <div class="mt-4">
+        <a href="{% url 'groups:post_detail' post.id %}" class="text-blue-500 hover:underline">Back to Post</a>
+    </div> {% endcomment %}
+</div>
+
+<script>
+    function preventMultipleSubmissions() {
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn.disabled) {
+            return false; // Prevent the form from being submitted
+        }
+        submitBtn.disabled = true; // Disable the button to prevent multiple clicks
+        return true; // Allow the form submission
+    }
+</script>
+
+{% endblock content %}

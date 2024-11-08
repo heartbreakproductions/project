@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto ">
+    {% comment %} <h1 class="text-xl font-semibold text-gray-800 mb-2">Blog Posts</h1> {% endcomment %}
+
+    <!-- Blog Post List -->
+    <div class="space-y-4">
+        {% for blog in page_obj %}
+            <div class="bg-white shadow-md p-4">
+                <div class="pb-2 h-[180px] w-full">
+                    <img class="h-full w-full object-cover" src="{{ blog.image.url }}" alt="{{ blog.title }}">
+                </div>
+                <a href="{% url 'blog:blog_detail' blog.publish.year blog.publish.month blog.publish.day blog.slug %}" class="text-lg">
+                    {{ blog.title }}
+                </a>
+                <p class="text-gray-500 text-sm">{{ blog.publish|date:"F j, Y" }}</p>
+                <p class="text-gray-700 mt-2">{{ blog.excerpt }}</p>
+            </div>
+        {% empty %}
+            <p class="text-gray-600">No blog posts available.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="mt-4 flex justify-between items-center text-sm">
+        {% if page_obj.has_previous %}
+            <a href="?page=1" class="text-blue-500">&laquo; First</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="text-blue-500 ">Previous</a>
+        {% else %}
+            <span class="text-gray-400">&laquo; First</span>
+            <span class="text-gray-400">Previous</span>
+        {% endif %}
+
+        <span class="text-gray-700 font-semibold">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="text-blue-500 hover:text-blue-700">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="text-blue-500 hover:text-blue-700">Last &raquo;</a>
+        {% else %}
+            <span class="text-gray-400">Next</span>
+            <span class="text-gray-400">Last &raquo;</span>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

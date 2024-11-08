@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto p-3 sm:p-6 bg-white shadow-lg">
+    <div class=" mx-auto">
+        <h1 class="text-xl  text-gray-800 mb-3">{{ blog.title }}</h1>
+        
+        {% if blog.image %}
+        <div class="mb-1 h-[200px]">
+            <img src="{{ blog.image.url }}" alt="{{ blog.title }}" class="w-full h-full object-cover shadow-lg">
+        </div>
+    {% endif %}
+    
+    <h4 class="text-base">By {{ blog.author }}</h4>
+    <h6 class="text-xs text-gray-800 mb-3">{{ blog.publish }}</h6>
+    
+    <div class="blog-body text-gray-700 leading-relaxed mb-8">
+        {{ blog.body_html|safe }}
+    </div>
+
+    <h2 class="text-xl text-gray-800 mt-8 mb-2">Comments</h2>
+
+    <div class="space-y-2">
+        {% for comment in comments %}
+            <div class="p-4 shadow-md">
+                <p class="text-gray-700">{{ comment.content }}</p>
+                <p class="text-sm text-gray-500">by {{ comment.user.username }} at {{ comment.created_at }}</p>
+                
+                {% if user == comment.user %}
+                    <form action="{% url 'blog:delete_comment' comment.id %}" method="post" class="">
+                        {% csrf_token %}
+                        <button type="submit" class="text-xs">Delete</button>
+                    </form>
+                    {% endif %}
+            </div>
+        {% empty %}
+            <p class="text-gray-500">No comments yet.</p>
+            {% endfor %}
+    </div>
+
+    {% if user.is_authenticated %}
+    <h3 class="text-xl text-gray-800 mt-8 mb-2 active:bg-gray-200">Add a comment</h3>
+        {% comment %} <form method="post" onsubmit="return preventMultipleSubmissions();" class="space-y-4">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" id="submitBtn" class="px-4 py-2 border bg-white">
+                Add Comment
+            </button>
+        </form> {% endcomment %}
+        <form method="post" onsubmit="return preventMultipleSubmissions();" class="">
+            {% csrf_token %}
+            
+            <!-- Style the form fields more compactly -->
+            <div class="">
+                {% for field in form %}
+                <div>
+                        {{ field.label_tag }} <!-- Display the field label -->
+                        {{ field|add_class:"w-full px-3 py-2 border border-gray-30 text-sm" }} <!-- Compact styling for input -->
+                        {% if field.errors %}
+                            <p class="text-red-500 text-xs mt-1">{{ field.errors|join:", " }}</p> <!-- Error message styling -->
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        
+            <button type="submit" id="submitBtn" class="w-full px-2 py-2 border bg-white active:bg-gray-200">
+                Add Comment
+            </button>
+        </form>
+    {% else %}
+        <p class="text-gray-500 mt-4">You must be logged in to add a comment.</p>
+    {% endif %}
+</div>
+</div>
+
+<script>
+    function preventMultipleSubmissions() {
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn.disabled) {
+            return false; // Prevent the form from being submitted again
+        }
+        submitBtn.disabled = true; // Disable the button to prevent multiple clicks
+        return true; // Allow the form submission
+    }
+</script>
+
+{% endblock %}

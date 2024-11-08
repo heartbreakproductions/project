@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="mx-auto p-4 bg-white shadow-lg ">
+    {% comment %} <h2 class="text-xl text-gray-800 mb-4 text-center">We Accept UPI Only</h2> {% endcomment %}
+    <div class="flex justify-center mb-4">
+        <img class="h-48 w-48 object-contain" src="{% static 'images/Gpaycropped.png' %}" alt="Donation QR Code">
+    </div>
+    <h3 class="text-lg font-medium text-gray-700  text-center">Scan to pay with any UPI app </h3>
+    <h4 class="mb-2 text-sm text-center">(Gpay, Paytm, PhonePe, BHIM etc.)</h4>
+    <p class="text-gray-600 leading-relaxed py-3">
+        We work hard to provide you with the best experience and help you achieve your goals. If you appreciate our efforts, consider supporting us through a donation. Your contribution will help us continue to improve and offer even more valuable services.
+    </p>
+    <p class="mt-2 text-gray-600 font-semibold">Every donation, big or small, makes a difference. Thank you for your support!</p>
+</div>
+
+{% endblock content %}

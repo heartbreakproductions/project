@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<h2>My Favorite Posts</h2>
+
+{% if favorites %}
+    <ul>
+        {% for favorite in favorites %}
+            <li>
+                <a href="{% url 'posts:post_detail' favorite.post.id %}">{{ favorite.post.title }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>You have no favorite posts.</p>
+{% endif %}
+
+{% endblock content %}
+
+

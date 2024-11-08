@@ -1,0 +1,166 @@
+{% comment %} <div class="h-16 bg-red-500 text-white ">
+
+<nav class="h-full mx-auto px-4 flex items-center">
+    <a href="/">Home</a>
+    <div>
+    <a href="/admin">Admin</a>
+
+    {% if user.is_authenticated %}
+        <a href="{% url 'profile_view' %}">Profile</a>
+        <a href="{% url 'notification_list' %}">
+            Notifications {% if unread_notification_count > 0 %}
+              ({{ unread_notification_count }})
+            {% endif %}
+        </a>
+        <form action="{% url 'logout' %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit">Log out</button>
+        </form>
+    {% else %}
+        <a href="{% url 'register' %}">Sign up</a>
+        <a href="{% url 'login' %}">Log in</a>
+    {% endif %}
+
+    </div>
+</nav>
+
+
+</div> {% endcomment %}
+
+
+
+
+
+<div class="bg-gradient-to-r from-[#45435C] to-[#586e9a] text-white h-12 w-full border-b">
+    <div class="h-full px-4  flex items-center  mx-auto justify-between ">
+        <div class="flex items-center space-x-2 justify-center">
+            
+            <a href="/">Home</a>
+            <i id="navbarButton" class="bi bi-chevron-down relative top-[2px]"></i>
+            
+        </div>
+        <div class="flex items-center space-x-3">
+            
+             {% if user.is_authenticated %}
+                {% comment %} <a href="{% url 'profile_view' %}">Profile</a> {% endcomment %}
+                <a href="{% url 'notification_list' %}">
+                    <i class="bi bi-bell relative top-[1px]"></i> 
+                    {% if unread_notification_count > 0 %}
+                    ({{ unread_notification_count }})
+                    {% endif %}
+                </a>
+                <i id="navbarAfterLoginModalButton" class="bi bi-three-dots"></i>
+                {% comment %} <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Log out</button>
+                </form> {% endcomment %}
+            {% else %}
+                <a href="{% url 'login' %}">Log in</a>
+                <a href="{% url 'register' %}">Sign up</a>
+            {% endif %} 
+        </div>
+    </div>
+</div>
+
+
+{% if user.is_authenticated %}
+<div id="navbarAfterLoginModal" class="hidden z-50 border-l-[1px] bg-white w-[40%] absolute right-0 overflow-x-hidden shadow-xl">
+    <div class="flex flex-col gap-3 p-3">
+        <a href="{% url 'profile_view' %}" class="space-x-1 w-full h-full py-[2px] text-center">
+            <span>Profile</span>
+            <i class="bi bi-person"></i>
+        </a>
+        
+        <form action="{% url 'logout' %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="space-x-1 w-full h-full py-[2px]">
+                <span>Log out</span>
+                <i class="bi bi-box-arrow-right"></i>
+            </button>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+
+<div id="navbarModal" class="hidden z-50 bg-white h-auto w-full absolute overflow-x-hidden shadow-xl">
+    
+    <div class="p-4 space-y-1">
+        <div class="flex justify-between gap-1 flex-wrap">
+
+            <a href="{% url 'posts:post_list' %}" class="space-x-1 px-[2px] py-[4px] border flex-auto text-center active:bg-gray-200">
+                <span>Posts</span>
+                <i class="bi bi-sticky relative top-[1px]"></i>
+            </a>
+            <a href="{% url 'blog:blog_list' %}" class="space-x-1 px-[2px] py-[4px] border flex-auto text-center active:bg-gray-200">
+                <span>Blog</span> 
+                <i class="bi bi-card-text relative top-[1px]"></i>
+            </a>
+            <a href="{% url 'groups:list' %}" class="space-x-1 px-[2px] py-[4px] border flex-auto text-center active:bg-gray-200">
+                <span>Groups</span> 
+                <i class="bi bi-collection relative top-[1px]"></i>
+            </a>
+            <a href="{% url 'services:services_list' %}" class="space-x-1 px-[2px] py-[4px] border flex-auto text-center">
+                <span>Services</span>
+                <i class="bi bi-gear relative top-[1px]"></i>
+            </a>
+        </div>
+        <div class="flex justify-between flex-wrap gap-1">
+
+            <a href="{% url 'jobs:job_list' %}" class="space-x-1 px-[2px] py-[4px] border flex-auto text-center active:bg-gray-200">
+                <span>Jobs</span> 
+                <i class="bi bi-suitcase-lg relative top-[1px]"></i>
+            </a>
+            <a href="{% url 'donate_page' %}" class="space-x-1 px-[2px] py-[4px] border flex-auto text-center active:bg-gray-200">
+                <span>Donate</span> 
+                <i class="bi bi-currency-rupee relative top-[1px]"></i>
+            </a>
+            <a href="{% url 'about_page' %}" class="space-x-1 px-[2px] py-[4px] border flex-auto text-center active:bg-gray-200">
+                <span>About</span> 
+                <i class="bi bi-info-circle relative top-[1px]"></i>
+            </a>
+            
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function() {
+        $('#navbarButton').click(function() {
+            $('#navbarModal').toggleClass('hidden');
+
+            // Toggle the icon based on modal visibility
+            if ($('#navbarModal').hasClass('hidden')) {
+                $('#navbarButton').removeClass('bi-chevron-up').addClass('bi-chevron-down');
+            } else {
+                $('#navbarButton').removeClass('bi-chevron-down').addClass('bi-chevron-up');
+            }
+            
+        });
+        
+    
+        $(document).click(function(e) {
+            if (!$(e.target).closest('#navbarButton, #navbarModal').length) {
+                $('#navbarModal').addClass('hidden');
+                $('#navbarButton').removeClass('bi-chevron-up').addClass('bi-chevron-down');
+            }
+        });
+
+
+        // Toggle navbar modal for logged-in users
+        $('#navbarAfterLoginModalButton').click(function() {
+            $('#navbarAfterLoginModal').toggleClass('hidden');
+        });
+
+        // Hide navbar modal when clicking outside of it
+        $(document).click(function(e) {
+            if (!$(e.target).closest('#navbarAfterLoginModalButton, #navbarAfterLoginModal').length) {
+                $('#navbarAfterLoginModal').addClass('hidden');
+            }
+        });
+
+
+    });
+</script>

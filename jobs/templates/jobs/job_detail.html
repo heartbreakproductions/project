@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white shadow-md p-3">
+    <h1 class="text-xl font-bold text-gray-800 mb-3">{{ job.title }}</h1>
+    
+    <div class="mb-4">
+        <p><strong class="text-gray-600">Company:</strong> <span class="text-gray-900">{{ job.company_name }}</span></p>
+        <p><strong class="text-gray-600">Location:</strong> <span class="text-gray-900">{{ job.city.name }}, {{ job.state.name }}, {{ job.country.name }}</span></p>
+        <p><strong class="text-gray-600">Type:</strong> <span class="text-gray-900">{{ job.job_type }}</span></p>
+        <p><strong class="text-gray-600">Level:</strong> <span class="text-gray-900">{{ job.experience_level }}</span></p>
+        <p><strong class="text-gray-600">Salary:</strong> <span class="text-gray-900">{{ job.salary_range }}</span></p>
+        <p><strong class="text-gray-600">Experience Level:</strong> <span class="text-gray-900">{{ job.experience_level }}</span></p>
+        <p><strong class="text-gray-600">Desired Skills:</strong> <span class="text-gray-900">{{ job.skills_required }}</span></p>
+        <p><strong class="text-gray-600">Experience Required:</strong> <span class="text-gray-900">{{ job.experience_required }}</span></p>
+    </div>
+
+    <div class="mb-3 text-gray-700">
+        <p class="leading-relaxed">{{ job.description }}</p>
+    </div>
+
+    <div class="text-sm text-gray-500 mb-3">
+        <p>Posted {{ job.days_since_posted }} days ago</p>
+    </div>
+
+    <a href="{{ job.link }}" target="_blank" class="inline-block border  py-2 px-4 active:bg-gray-200">
+        Apply Now
+    </a>
+</div>
+{% endblock content %}
