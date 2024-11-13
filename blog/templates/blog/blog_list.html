@@ -2,15 +2,20 @@
 
 {% block content %}
 <div class="max-w-4xl mx-auto ">
+    {% if user.is_staff %}
+        <a href="{% url 'blog:create_blog' %}" class="mb-2">Create Blog</a>
+    {% endif %}
     {% comment %} <h1 class="text-xl font-semibold text-gray-800 mb-2">Blog Posts</h1> {% endcomment %}
 
     <!-- Blog Post List -->
     <div class="space-y-4">
         {% for blog in page_obj %}
             <div class="bg-white shadow-md p-4">
+                {% if blog.image and blog.image.url %}
                 <div class="pb-2 h-[180px] w-full">
                     <img class="h-full w-full object-cover" src="{{ blog.image.url }}" alt="{{ blog.title }}">
                 </div>
+                {% endif %}
                 <a href="{% url 'blog:blog_detail' blog.publish.year blog.publish.month blog.publish.day blog.slug %}" class="text-lg">
                     {{ blog.title }}
                 </a>

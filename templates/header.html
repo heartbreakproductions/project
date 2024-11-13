@@ -28,10 +28,12 @@
 </div> {% endcomment %}
 
 
+<div class="flex justify-center items-center h-[30px]">
 
+    <marquee style="font-size: 15px;" class="sampleMarquee italic" direction="left" scrollamount="7" behavior="scroll"><a href="{% url 'donate_page' %}">Please Donate ! Your Generous Donations Keep This Site Running Smoothly.</a></marquee>
+</div>
 
-
-<div class="bg-gradient-to-r from-[#45435C] to-[#586e9a] text-white h-12 w-full border-b">
+<div class="bg-gradient-to-r from-[#45435C] to-[#586e9a] text-white h-14 w-full border-b">
     <div class="h-full px-4  flex items-center  mx-auto justify-between ">
         <div class="flex items-center space-x-2 justify-center">
             
@@ -55,8 +57,8 @@
                     <button type="submit">Log out</button>
                 </form> {% endcomment %}
             {% else %}
-                <a href="{% url 'login' %}">Log in</a>
-                <a href="{% url 'register' %}">Sign up</a>
+                <a class="px-3 py-1 bg-white text-black" href="{% url 'login' %}">Log in</a>
+                <a class="px-3 py-1 bg-white text-black" href="{% url 'register' %}">Sign up</a>
             {% endif %} 
         </div>
     </div>
@@ -65,19 +67,21 @@
 
 {% if user.is_authenticated %}
 <div id="navbarAfterLoginModal" class="hidden z-50 border-l-[1px] bg-white w-[40%] absolute right-0 overflow-x-hidden shadow-xl">
-    <div class="flex flex-col gap-3 p-3">
-        <a href="{% url 'profile_view' %}" class="space-x-1 w-full h-full py-[2px] text-center">
+    <div class="flex flex-col">
+
+        <a href="{% url 'profile_view' %}" style="display: block;" class="border-b-[1px] text-center py-2 px-3 active:bg-gray-200 cursor-pointer">
             <span>Profile</span>
             <i class="bi bi-person"></i>
         </a>
         
-        <form action="{% url 'logout' %}" method="post" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit" class="space-x-1 w-full h-full py-[2px]">
-                <span>Log out</span>
-                <i class="bi bi-box-arrow-right"></i>
-            </button>
-        </form>
+
+            <form action="{% url 'logout' %}" method="post" style="display: block;" class=" text-center py-[8px] px-3 active:bg-red-500 cursor-pointer">
+                {% csrf_token %}
+                <button type="submit" >
+                    <span>Log out</span>
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
+            </form>
     </div>
 </div>
 {% endif %}

@@ -4,60 +4,39 @@
 <div class="max-w-2xl p-3 bg-white rounded shadow-md ">
     <!-- Post Title and Body -->
     <h1 class="text-2xl font-semibold text-gray-800 mb-4">{{ post.title }}</h1>
-    <p class="text-gray-700 mb-4">{{ post.body }}</p>
+    {% comment %} <p class="text-gray-700 mb-4">{{ post.body }}</p> {% endcomment %}
+    <div class="text-gray-700 mb-4">{{ post.body_html|safe }}</div>
 
     <!-- Post Metadata -->
     <p class="text-sm text-gray-500 mb-4">
         Posted by <span class="font-medium">{{ post.author.username }}</span> on {{ post.created_at|date:"Y-m-d H:i" }}
     </p>
 
-    <!-- Voting Section -->
-    {% comment %} <div class="flex items-center space-x-4 mb-6">
-        <p class="text-green-600 font-semibold">Upvotes: </p>
-        <p class="text-red-600 font-semibold">Downvotes: </p>
-    </div> {% endcomment %}
-    
     <div class="flex space-x-4 mb-6">
         <!-- Upvote Button -->
-        <form action="{% url 'groups:upvote_post' post.id %}" method="post" class="inline">
-            {% csrf_token %}
-            <button type="submit" 
-                    class="px-4 py-2 border focus:outline-none{% if user_vote and user_vote.vote_type == 'upvote' %}opacity-50 cursor-not-allowed{% endif %}"
-                    {% if user_vote and user_vote.vote_type == 'upvote' %}disabled{% endif %}>
-                Upvote {{ post.upvotes }}
-            </button>
-        </form>
+        <button id="upvote-button" class="px-4 py-2 border focus:outline-none">
+            Upvote <span id="upvote-count">{{ post.upvotes }}</span>
+        </button>
 
         <!-- Downvote Button -->
-        <form action="{% url 'groups:downvote_post' post.id %}" method="post" class="inline">
-            {% csrf_token %}
-            <button type="submit" 
-                    class="px-4 py-2 border focus:outline-none {% if user_vote and user_vote.vote_type == 'downvote' %}opacity-50 cursor-not-allowed{% endif %}"
-                    {% if user_vote and user_vote.vote_type == 'downvote' %}disabled{% endif %}>
-                Downvote {{ post.downvotes }}
-            </button>
-        </form>
+        <button id="downvote-button" class="px-4 py-2 border focus:outline-none">
+            Downvote <span id="downvote-count">{{ post.downvotes }}</span>
+        </button>
     </div>
+
+    {% comment %} delete post {% endcomment %}
+    {% if request.user.is_authenticated and post.author == request.user %}
+        <div class="mb-4 space-x-3">
+            <a href="{% url 'groups:update_post' post.id %}" class="">Edit</a>
+            <a href="{% url 'groups:delete_post' post.id %}" class="text-red-600 hover:underline" onclick="return confirm('Are you sure you want to delete this post?');">Delete</a>
+        </div>
+    {% endif %}
 
     <!-- Comments Section -->
     <h2 class="text-xl font-semibold text-gray-800 mb-2">Comments</h2>
     <div class="mb-4">
         <a href="{% url 'groups:add_comment' post.id %}" class="border px-2 py-1">Add a Comment</a>
     </div>
-
-
-    {% comment %} {% if comments %}
-        <div class="space-y-4">
-            {% for comment in comments %}
-            <div class="p-2 bg-gray-100 shadow-sm">
-
-                {% include 'groups/comment_item.html' with comment=comment %}
-            </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p class="text-gray-600">No comments yet. Be the first to comment!</p>
-    {% endif %} {% endcomment %}
 
     <div class="py-3">
         {% for comment in top_level_comments %}
@@ -74,19 +53,53 @@
                         {% endfor %}
                     {% endwith %}
                 </div>
-                {% comment %} <a href="{% url 'groups:add_comment_reply' post.id comment.id %}">Reply</a> {% endcomment %}
                 <a href="{% url 'groups:add_comment_reply' post.id comment.id %}">Reply</a>
                 {% if comment.user == request.user %}
                     | <a href="{% url 'groups:delete_comment' comment.id %}">Delete</a>
                 {% endif %}
                 <div class="pl-7 w-full">
-                    {% comment %} {% include 'groups/comment_replies.html' with comment=comment %} {% endcomment %}
                     {% include 'groups/comment_replies.html' with comment=comment post=post %}
                 </div>
             </div>
         {% endfor %}
     </div>
-    
-    
 </div>
+
+<script>
+    $(document).ready(function() {
+        $("#upvote-button").click(function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: "{% url 'groups:upvote_post' post.id %}",
+                type: "POST",
+                data: {
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $("#upvote-count").text(response.new_upvote_count);
+                        $("#downvote-count").text(response.new_downvote_count);
+                    }
+                }
+            });
+        });
+
+        $("#downvote-button").click(function(event) {
+            event.preventDefault();
+            $.ajax({
+                url: "{% url 'groups:downvote_post' post.id %}",
+                type: "POST",
+                data: {
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $("#upvote-count").text(response.new_upvote_count);
+                        $("#downvote-count").text(response.new_downvote_count);
+                    }
+                }
+            });
+        });
+    });
+</script>
 {% endblock content %}

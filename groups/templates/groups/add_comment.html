@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="max-w-2xl mx-auto p-3 bg-white  shadow-md ">
-    <h1 class="text-xl text-gray-800 mb-4">Comment on "{{ post.title }}"</h1>
+    <h1 class="text-xl text-gray-800 mb-4">Comment</h1>
 
     {% if parent_comment %}
     <p class="text-sm text-gray-600 mb-4">Replying to: <strong>{{ parent_comment.user.username }}</strong> - "{{ parent_comment.content }}"</p>
@@ -24,9 +24,7 @@
         </button>
     </form>
 
-    {% comment %} <div class="mt-4">
-        <a href="{% url 'groups:post_detail' post.id %}" class="text-blue-500 hover:underline">Back to Post</a>
-    </div> {% endcomment %}
+    
 </div>
 
 <script>

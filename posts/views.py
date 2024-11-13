@@ -15,6 +15,7 @@ from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from notifications.models import Notification
 import re
+from django.http import JsonResponse
 
 
 # index
@@ -81,6 +82,33 @@ def post_list(request):
     return render(request, 'posts/post_list.html', {'posts': posts})
 
 
+
+@login_required  # Ensure the user is logged in
+def post_detail(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    # Convert the post body from Markdown to HTML
+    post.body_html = markdown.markdown(post.body)
+
+    # Check if the post is in the user's favorites
+    is_favorited = False
+    if request.user.is_authenticated:
+        is_favorited = Favorite.objects.filter(user=request.user, post=post).exists()
+
+    # Mark notifications as read for this post
+    Notification.objects.filter(post=post, recipient=request.user, read=False).update(read=True)
+
+    # Get all comments (including replies) related to this post
+    # The 'parent' field is used to get nested replies.
+    top_level_comments = post.post_comments.filter(parent=None)
+
+    return render(request, 'posts/post_detail.html', {
+        'post': post,
+        'is_favorited': is_favorited,
+        'top_level_comments': top_level_comments
+    })
+
+
 @login_required
 def post_create(request):
     if request.method == "POST":
@@ -117,62 +145,17 @@ def post_delete(request, post_id):
 
 
 
-# @login_required  # Ensure the user is logged in
-# def post_detail(request, post_id):
-#     post = get_object_or_404(Post, id=post_id)
-
-#     # Convert the post body from Markdown to HTML
-#     post.body_html = markdown.markdown(post.body)
-
-#     # Check if the post is in the user's favorites
-#     is_favorited = False
-#     if request.user.is_authenticated:
-#         is_favorited = Favorite.objects.filter(user=request.user, post=post).exists()
-
-#     # Mark notifications as read for this post
-#     Notification.objects.filter(post=post, recipient=request.user, read=False).update(read=True)
-
-#     # Get all top-level comments related to this post
-#     top_level_comments = post.post_comments.filter(parent=None)  # Only top-level comments
-
-#     return render(request, 'posts/post_detail.html', {
-#         'post': post,
-#         'is_favorited': is_favorited,
-#         'top_level_comments': top_level_comments
-#     })
-
-@login_required  # Ensure the user is logged in
-def post_detail(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-
-    # Convert the post body from Markdown to HTML
-    post.body_html = markdown.markdown(post.body)
-
-    # Check if the post is in the user's favorites
-    is_favorited = False
-    if request.user.is_authenticated:
-        is_favorited = Favorite.objects.filter(user=request.user, post=post).exists()
-
-    # Mark notifications as read for this post
-    Notification.objects.filter(post=post, recipient=request.user, read=False).update(read=True)
-
-    # Get all comments (including replies) related to this post
-    # The 'parent' field is used to get nested replies.
-    top_level_comments = post.post_comments.filter(parent=None)
-
-    return render(request, 'posts/post_detail.html', {
-        'post': post,
-        'is_favorited': is_favorited,
-        'top_level_comments': top_level_comments
-    })
-
 
 # @login_required
 # def add_comment(request, post_id, parent_id=None):
 #     post = get_object_or_404(Post, id=post_id)
 #     parent_comment = None
+#     initial_content = ''
+
 #     if parent_id:
 #         parent_comment = get_object_or_404(Comment, id=parent_id)
+#         # Get the username of the parent comment author for replying
+#         initial_content = f"@{parent_comment.user.username} "
 
 #     if request.method == 'POST':
 #         form = CommentForm(request.POST)
@@ -182,9 +165,23 @@ def post_detail(request, post_id):
 #             comment.post = post
 #             if parent_comment:
 #                 comment.parent = parent_comment
+
+#             # Extract mentioned usernames from the comment content
+#             mentioned_usernames = re.findall(r"@(\w+)", comment.content)
 #             comment.save()
 
-#             # Notify the post author if they aren't the one commenting and there's no parent comment
+#             # Create a notification for each mentioned user
+#             for mentioned_username in mentioned_usernames:
+#                 mentioned_user = User.objects.filter(username=mentioned_username).first()
+#                 if mentioned_user:
+#                     Notification.objects.create(
+#                         recipient=mentioned_user,
+#                         notification_type='mention',
+#                         post=post,
+#                         comment=comment
+#                     )
+
+#             # Notification logic for post author and parent comment user
 #             if post.author != request.user and not parent_comment:
 #                 Notification.objects.create(
 #                     recipient=post.author,
@@ -192,8 +189,6 @@ def post_detail(request, post_id):
 #                     post=post,
 #                     comment=comment
 #                 )
-
-#             # Notify the parent comment user if it's a reply, and prevent duplicate notifications
 #             elif parent_comment and parent_comment.user != request.user:
 #                 Notification.objects.create(
 #                     recipient=parent_comment.user,
@@ -204,52 +199,10 @@ def post_detail(request, post_id):
 
 #             return redirect('posts:post_detail', post_id=post.id)
 #     else:
-#         form = CommentForm()
+#         # Pre-populate the form with @username if replying to a specific comment
+#         form = CommentForm(initial={'content': initial_content})
 
 #     return render(request, 'posts/comment_form.html', {'form': form, 'post': post, 'parent_comment': parent_comment})
-
-# @login_required
-# def add_comment(request, post_id, parent_id=None):
-#     post = get_object_or_404(Post, id=post_id)
-#     parent_comment = None
-#     if parent_id:
-#         parent_comment = get_object_or_404(Comment, id=parent_id)
-
-#     if request.method == 'POST':
-#         form = CommentForm(request.POST)
-#         if form.is_valid():
-#             comment = form.save(commit=False)
-#             comment.user = request.user
-#             comment.post = post
-#             if parent_comment:
-#                 comment.parent = parent_comment
-#             comment.save()
-
-#             # Notify the post author if they aren't the one commenting and there's no parent comment
-#             if post.author != request.user and not parent_comment:
-#                 Notification.objects.create(
-#                     recipient=post.author,
-#                     notification_type='comment',
-#                     post=post,
-#                     comment=comment
-#                 )
-
-#             # Notify the parent comment user if it's a reply, and prevent duplicate notifications
-#             elif parent_comment and parent_comment.user != request.user:
-#                 Notification.objects.create(
-#                     recipient=parent_comment.user,
-#                     notification_type='reply',
-#                     post=post,
-#                     comment=comment
-#                 )
-
-#             return redirect('posts:post_detail', post_id=post.id)
-#     else:
-#         form = CommentForm()
-
-#     return render(request, 'posts/comment_form.html', {'form': form, 'post': post, 'parent_comment': parent_comment})
-
-
 
 
 @login_required
@@ -279,7 +232,7 @@ def add_comment(request, post_id, parent_id=None):
             # Create a notification for each mentioned user
             for mentioned_username in mentioned_usernames:
                 mentioned_user = User.objects.filter(username=mentioned_username).first()
-                if mentioned_user:
+                if mentioned_user and mentioned_user != request.user:  # Avoid notifying the author themselves
                     Notification.objects.create(
                         recipient=mentioned_user,
                         notification_type='mention',
@@ -309,8 +262,6 @@ def add_comment(request, post_id, parent_id=None):
         form = CommentForm(initial={'content': initial_content})
 
     return render(request, 'posts/comment_form.html', {'form': form, 'post': post, 'parent_comment': parent_comment})
-
-
 
 
 
@@ -386,7 +337,10 @@ def vote_post(request, post_id):
 
         if existing_vote:
             if existing_vote.vote_type == vote_type:
-                return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+                return JsonResponse({
+                    'upvotes': post.upvotes,
+                    'downvotes': post.downvotes
+                })
             else:
                 existing_vote.vote_type = vote_type
                 existing_vote.save()
@@ -394,12 +348,6 @@ def vote_post(request, post_id):
                 if vote_type == 'upvote':
                     post.upvotes += 1
                     post.downvotes -= 1
-                    if post.author != request.user:
-                        Notification.objects.create(
-                            recipient=post.author,
-                            notification_type='upvote',
-                            post=post
-                        )
                 elif vote_type == 'downvote':
                     post.downvotes += 1
                     post.upvotes -= 1
@@ -408,16 +356,15 @@ def vote_post(request, post_id):
 
             if vote_type == 'upvote':
                 post.upvotes += 1
-                if post.author != request.user:
-                    Notification.objects.create(
-                        recipient=post.author,
-                        notification_type='upvote',
-                        post=post
-                    )
             elif vote_type == 'downvote':
                 post.downvotes += 1
 
         post.save()
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+        # Return updated vote counts as JSON
+        return JsonResponse({
+            'upvotes': post.upvotes,
+            'downvotes': post.downvotes
+        })
 
     return HttpResponseForbidden("Invalid request.")

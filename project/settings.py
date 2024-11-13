@@ -21,14 +21,17 @@ LOGOUT_REDIRECT_URL = '/'
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-STATIC_URL = '/static/'
+# STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = BASE_DIR / 'media'
+
+STATIC_ROOT = '/var/www/static'
+STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'  # Use Path object for better handling
-
-
+MEDIA_ROOT = '/var/www/media'
 
 
 # Quick-start development settings - unsuitable for production
@@ -40,7 +43,9 @@ SECRET_KEY = 'django-insecure-lkb_^-*+^*wz$9n&qmpgrwqoe#dcqf7b9=zy4fgw#8o=uf$nmu
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['onignou.in','www.onignou.in','145.223.23.15']
+# ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS = ['145.223.23.15', 'onignou.in', 'www.onignou.in']
 
 
 # Application definition
@@ -157,7 +162,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+# STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -167,12 +172,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 RECAPTCHA_PUBLIC_KEY = '6Leko3cqAAAAALnM3jof9sj0Y9Cazp1HpPItfHo5'
 RECAPTCHA_PRIVATE_KEY = '6Leko3cqAAAAACaA-4PULoJQv1g8h9WALSoMloCq'
 
-
-SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_SSL_REDIRECT = True
-X_FRAME_OPTIONS = 'DENY'
-SECURE_HSTS_SECONDS = 3600
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True

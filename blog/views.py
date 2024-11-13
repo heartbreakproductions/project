@@ -1,15 +1,14 @@
 # blog/views.py
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Blog, Comment
 from .forms import CommentForm
 import markdown  # Add this import
 from django.http import HttpResponseForbidden
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.admin.views.decorators import staff_member_required
+from .forms import BlogForm
 
-# def blog_list(request):
-#     blogs = Blog.objects.all().order_by('-created')
-#     return render(request, 'blog/blog_list.html', {'blogs': blogs})
 
 def blog_list(request):
     blogs = Blog.objects.all().order_by('-created')
@@ -27,6 +26,7 @@ def blog_list(request):
 
     return render(request, 'blog/blog_list.html', {'page_obj': page_obj})
 
+
 def blog_detail(request, year, month, day, slug):
     blog = get_object_or_404(
         Blog,
@@ -39,7 +39,11 @@ def blog_detail(request, year, month, day, slug):
     comments = blog.comments.all()
 
     # Convert the blog body from Markdown to HTML
-    blog.body_html = markdown.markdown(blog.body)
+    # blog.body_html = markdown.markdown(blog.body)
+    blog.body_html = markdown.markdown(
+        blog.body,
+        extensions=['extra', 'codehilite', 'toc']  # Add any other desired extensions
+    )
 
     if request.method == 'POST':
         form = CommentForm(request.POST)
@@ -90,3 +94,27 @@ def delete_comment(request, comment_id):
     comment.delete()
 
     return redirect('blog:blog_detail', year=blog.publish.year, month=blog.publish.month, day=blog.publish.day, slug=blog.slug)
+
+
+def is_admin(user):
+    return user.is_superuser
+
+@user_passes_test(is_admin)
+@login_required
+def create_or_update_blog(request, pk=None):
+    if pk:
+        blog = get_object_or_404(Blog, pk=pk)
+        form = BlogForm(request.POST or None, request.FILES or None, instance=blog)
+        context_title = "Update Blog Post"
+    else:
+        blog = None
+        form = BlogForm(request.POST or None, request.FILES or None)
+        context_title = "Create a Blog Post"
+
+    if request.method == 'POST' and form.is_valid():
+        blog = form.save(commit=False)
+        blog.author = request.user
+        blog.save()
+        return redirect('blog:blog_detail', year=blog.publish.year, month=blog.publish.month, day=blog.publish.day, slug=blog.slug)
+
+    return render(request, 'blog/create_blog.html', {'form': form, 'blog': blog, 'context_title': context_title})

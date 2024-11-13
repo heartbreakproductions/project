@@ -4,7 +4,7 @@ from .models import Group, Post, Comment
 class GroupForm(forms.ModelForm):
     class Meta:
         model = Group
-        fields = ['name', 'description']  # Include description field
+        fields = ['name', 'description'] 
 
 
 class PostForm(forms.ModelForm):

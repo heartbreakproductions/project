@@ -9,15 +9,6 @@ def notification_list(request):
     notifications = Notification.objects.filter(recipient=request.user, deleted=False).order_by('-timestamp')
     return render(request, 'notifications/notification_list.html', {'notifications': notifications})
 
-# def notification_list(request):
-#     notifications = Notification.objects.filter(recipient=request.user).order_by('-timestamp')
-#     unread_notification_count = notifications.filter(read=False).count()
-
-#     context = {
-#         'notifications': notifications,
-#         'unread_notification_count': unread_notification_count,
-#     }
-#     return render(request, 'notifications/notification_list.html', context)
 
 @login_required
 def read_notification(request, notification_id):

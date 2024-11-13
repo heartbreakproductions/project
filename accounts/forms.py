@@ -9,11 +9,16 @@ class UserUpdateForm(forms.ModelForm):
         model = User
         fields = ['username','email']
 
+# class ProfileUpdateForm(forms.ModelForm):
+#     class Meta:
+#         model = UserProfile
+#         fields = ['profile_image']
+        
+
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['profile_image']
-        
+        fields = ['profile_image', 'phone_number', 'country', 'state']
 
 class CustomUserCreationForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=True)

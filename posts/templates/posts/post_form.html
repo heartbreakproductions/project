@@ -44,5 +44,31 @@
         </div>
     </div>
 
+    <script>
+        $(document).ready(function() {
+            $('#id_body').summernote({
+                height: 300, // Set editor height
+                toolbar: [
+                    // Customized toolbar without image, file, or embedded link options
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['strikethrough', 'superscript', 'subscript']],
+                    ['fontsize', ['fontsize']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['height', ['height']]
+                ],
+                disableDragAndDrop: true, // Prevent dragging and dropping files
+                callbacks: {
+                    onImageUpload: function() {
+                        alert('Image uploads are disabled.');
+                    },
+                    onMediaDelete: function() {
+                        alert('Media deletion is not allowed.');
+                    }
+                }
+            });
+        });
+    </script>
+
 
 {% endblock content %}

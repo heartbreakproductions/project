@@ -61,6 +61,18 @@ class Blog(models.Model):
             if os.path.isfile(self.image.path):
                 os.remove(self.image.path)
         super().delete(*args, **kwargs)
+        
+    def save(self, *args, **kwargs):
+        # Check if a new image is being uploaded
+        if self.pk:
+            existing = Blog.objects.filter(pk=self.pk).first()
+            if existing and existing.image and existing.image != self.image:
+                # Delete the old image if it exists
+                old_image_path = existing.image.path
+                if os.path.isfile(old_image_path):
+                    os.remove(old_image_path)
+
+        super().save(*args, **kwargs)
     
     
 
