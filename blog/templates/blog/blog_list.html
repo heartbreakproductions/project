@@ -13,7 +13,7 @@
             <div class="bg-white shadow-md p-4">
                 {% if blog.image and blog.image.url %}
                 <div class="pb-2 h-[180px] w-full">
-                    <img class="h-full w-full object-cover" src="{{ blog.image.url }}" alt="{{ blog.title }}">
+                    <img class="h-full w-full object-contain bg-white" src="{{ blog.image.url }}" alt="{{ blog.title }}">
                 </div>
                 {% endif %}
                 <a href="{% url 'blog:blog_detail' blog.publish.year blog.publish.month blog.publish.day blog.slug %}" class="text-lg">

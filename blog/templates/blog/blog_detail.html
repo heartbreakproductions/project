@@ -17,7 +17,7 @@
         
         {% if blog.image and blog.image.url %}
         <div class="mb-1 h-[200px]">
-            <img src="{{ blog.image.url }}" alt="{{ blog.title }}" class="w-full h-full object-cover shadow-lg">
+            <img src="{{ blog.image.url }}" alt="{{ blog.title }}" class="w-full h-full object-contain bg-white shadow-lg">
         </div>
     {% endif %}
     
