@@ -41,12 +41,12 @@ MEDIA_ROOT = '/var/www/media'
 SECRET_KEY = 'django-insecure-lkb_^-*+^*wz$9n&qmpgrwqoe#dcqf7b9=zy4fgw#8o=uf$nmu'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = False
-DEBUG = True
+DEBUG = False
+# DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
-# ALLOWED_HOSTS = ['145.223.23.15', 'onignou.in', 'www.onignou.in']
+ALLOWED_HOSTS = ['145.223.23.15', 'onignou.in', 'www.onignou.in']
 
 
 # Application definition
@@ -111,23 +111,23 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.getenv('DB_NAME', 'onignou_db'),
-#         'USER': os.getenv('DB_USER', 'heartbreakproductions'),
-#         'PASSWORD': os.getenv('DB_PASSWORD', 'onignou2@@2'),
-#         'HOST': os.getenv('DB_HOST', 'localhost'),
-#         'PORT': os.getenv('DB_PORT', '5432'),
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'onignou_db'),
+        'USER': os.getenv('DB_USER', 'heartbreakproductions'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'onignou2@@2'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
