@@ -10,3 +10,6 @@ class GroupSitemap(Sitemap):
 
     def lastmod(self, obj):
         return obj.created_at  # Field to indicate the last modification time
+
+    def location(self, obj):
+        return f'http://onignou.in/{obj.get_absolute_url()}'

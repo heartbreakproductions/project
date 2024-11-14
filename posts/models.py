@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 import os
 from django.utils import timezone
+from django.urls import reverse
 
 class Post(models.Model):
     title = models.CharField(max_length=200)
@@ -29,6 +30,9 @@ class Post(models.Model):
                     os.remove(old_image_path)
 
         super().save(*args, **kwargs)
+    
+    def get_absolute_url(self):
+        return reverse('post_detail', kwargs={'pk': self.pk})
 
     # class Meta:
     #     ordering = ['-created_at']  # Order by creation date, assuming you add created_at field

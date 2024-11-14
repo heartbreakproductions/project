@@ -1,5 +1,6 @@
 from django.contrib.sitemaps import Sitemap
 from .models import Post
+from django.urls import reverse
 
 class PostSitemap(Sitemap):
     changefreq = 'daily'  # How frequently the content changes
@@ -10,3 +11,9 @@ class PostSitemap(Sitemap):
 
     def lastmod(self, obj):
         return obj.created_at  # Field to indicate the last modification time
+
+    # def location(self, obj):
+    #     return reverse('posts:post_detail', args=[obj.id])
+
+    def location(self, obj):
+        return f'http://onignou.in/{obj.get_absolute_url()}'
