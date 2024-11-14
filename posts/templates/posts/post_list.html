@@ -29,6 +29,7 @@
                 <h2 class="text-xl font-bold">
                     <a href="{% url 'posts:post_detail' post.id %}" class="">{{ post.title }}</a>
                 </h2>
+                <h6 class="text-xs text-gray-700">By {{ post.author }}</h6>
                 {% if post.image %}
                 <div class="h-[180px] w-full">
                     <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full mt-2 h-full object-cover" />

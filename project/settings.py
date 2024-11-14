@@ -42,6 +42,7 @@ SECRET_KEY = 'django-insecure-lkb_^-*+^*wz$9n&qmpgrwqoe#dcqf7b9=zy4fgw#8o=uf$nmu
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
+# DEBUG = True
 
 # ALLOWED_HOSTS = []
 
@@ -67,6 +68,7 @@ INSTALLED_APPS = [
     'notifications',
     # 'widget_tweaks',
     'django_recaptcha',
+    'django.contrib.sitemaps'
 
 ]
 

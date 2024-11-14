@@ -20,6 +20,18 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from django.contrib.sitemaps.views import sitemap
+from posts.sitemap import PostSitemap
+from groups.sitemap import GroupSitemap
+from blog.sitemap import BlogSitemap
+
+
+sitemaps = {
+    'posts': PostSitemap,
+    'groups': GroupSitemap,
+    'blog': BlogSitemap,
+}
+
 
 urlpatterns = [
     # path('', views.Homepage.as_view(),name='home'),
@@ -33,7 +45,8 @@ urlpatterns = [
     path('jobs/', include('jobs.urls', namespace='jobs')),
     path('groups/', include('groups.urls', namespace='groups')),
     path('notifications/', include('notifications.urls')),
-    # demo
+    
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     
 ]
 
