@@ -16,7 +16,7 @@
                     <img class="h-full w-full object-contain bg-white" src="{{ blog.image.url }}" alt="{{ blog.title }}">
                 </div>
                 {% endif %}
-                <a href="{% url 'blog:blog_detail' blog.publish.year blog.publish.month blog.publish.day blog.slug %}" class="text-lg">
+                <a href="{% url 'blog:blog_detail' blog.publish.year blog.publish.month blog.publish.day blog.slug %}" class="text-lg font-semibold">
                     {{ blog.title }}
                 </a>
                 <p class="text-gray-500 text-sm">{{ blog.publish|date:"F j, Y" }}</p>

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto p-6 bg-white shadow-md">
+    <h1 class="text-2xl font-semibold mb-4">User Profile</h1>
+
+    <!-- Profile Image Display -->
+    {% if user_profile.profile_image %}
+    <div class="mt-4">
+        <label class="block text-gray-700 font-medium">Profile Image</label>
+        <img src="{{ user_profile.profile_image.url }}" alt="Profile Image" class="w-32 h-32 border mt-2">
+    </div>
+    {% else %}
+    <div class="mt-4">
+        <p class="text-gray-600">No profile image uploaded.</p>
+    </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" class="space-y-4">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+
+            <!-- Profile Image Upload -->
+            <div class="mt-4">
+                <label class="block text-gray-700 font-medium">Upload New Profile Image</label>
+                {{ profile_form.profile_image|add_class:"py-1 focus:outline-none w-full mt-2" }}
+            </div>
+
+            <div>
+                <label for="id_bio" class="block text-gray-700 font-medium">Bio</label>
+                {{ profile_form.bio|add_class:"border border-gray-300 py-1 px-3 focus:outline-none w-full mt-2" }}
+            </div>
+
+            <div>
+                <label class="block text-gray-700 font-medium">Username</label>
+                {{ user_form.username|add_class:"border border-gray-300 py-1 px-3 focus:outline-none w-full mt-2" }}
+            </div>
+            <div>
+                <label class="block text-gray-700 font-medium">Email</label>
+                {{ user_form.email|add_class:"border border-gray-300 py-1 px-3 focus:outline-none w-full mt-2" }}
+            </div>
+
+            <!-- New Fields for First and Last Name -->
+            <div>
+                <label class="block text-gray-700 font-medium">First Name</label>
+                {{ user_form.first_name|add_class:"border border-gray-300 py-1 px-3 focus:outline-none w-full mt-2" }}
+            </div>
+            <div>
+                <label class="block text-gray-700 font-medium">Last Name</label>
+                {{ user_form.last_name|add_class:"border border-gray-300 py-1 px-3 focus:outline-none w-full mt-2" }}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+                <label class="block text-gray-700 font-medium">Phone Number</label>
+                {{ profile_form.phone_number|add_class:"border border-gray-300 py-1 px-3 focus:outline-none w-full mt-2" }}
+            </div>
+            <div>
+                <label class="block text-gray-700 font-medium">Country</label>
+                {{ profile_form.country|add_class:"border border-gray-300 py-1 px-3 focus:outline-none w-full mt-2" }}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+                <label class="block text-gray-700 font-medium">State</label>
+                {{ profile_form.state|add_class:"border border-gray-300 py-1 px-3 focus:outline-none w-full mt-2" }}
+            </div>
+        </div>
+
+        <button type="submit" class="mt-4 border text-black bg-white py-1 px-2">Update Profile</button>
+    </form>
+
+    <form method="POST" action="{% url 'delete_account' %}" class="mt-4" id="delete-account-form">
+        {% csrf_token %}
+        <button type="submit" class="bg-red-500 text-white py-1 px-2 hover:bg-red-600">Delete Account</button>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#delete-account-form').on('submit', function(e) {
+            var confirmDelete = confirm('Are you sure you want to delete your account? This action cannot be undone.');
+            if (!confirmDelete) {
+                e.preventDefault();  // Prevent form submission if user cancels
+            }
+        });
+
+        $('#id_bio').summernote({
+            height: 300, // Set editor height
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['insert', ['link']],
+            ],
+            disableDragAndDrop: true,
+            callbacks: {
+                onImageUpload: function() {
+                    alert('Image uploads are disabled.');
+                },
+                onMediaDelete: function() {
+                    alert('Media deletion is not allowed.');
+                }
+            }
+        });
+    });
+</script>
+
+{% endblock content %}

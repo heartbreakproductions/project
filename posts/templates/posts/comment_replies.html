@@ -1,6 +1,10 @@
 {% for reply in comment.replies.all %}
     <div class="pt-3 w-full">
-        <p><strong>{{ reply.user.username }}</strong>: {{ reply.content }}</p>
+        <p>
+            <a href="{% url 'profile_view' reply.user.username %}">
+               <strong>{{ reply.user.username }}</strong> 
+            </a>
+            : {{ reply.content }}</p>
         {% comment %} <p><small>{{ reply.created_at }}</small></p> {% endcomment %}
 
         <!-- Allow reply only if logged in -->

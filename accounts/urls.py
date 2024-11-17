@@ -1,7 +1,7 @@
 from . import views
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import profile_view, delete_account
+from .views import profile_view, delete_account, profile_edit
 
 # urlpatterns = [
 #     path('register/', views.register, name='register'),
@@ -19,6 +19,10 @@ urlpatterns = [
     path('profile/', profile_view, name='profile_view'),
     # path('profile/<str:username>/', profile_view, name='profile_view'),  # Added username parameter
     path('profile/delete/', delete_account, name='delete_account'),
+    path('profile/<str:username>/', profile_view, name='profile_view'),
+    path('profile/<str:username>/edit/', profile_edit, name='profile_edit'),
 ]
+
+
 
 

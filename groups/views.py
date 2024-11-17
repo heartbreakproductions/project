@@ -33,6 +33,27 @@ def create_group(request):
         form = GroupForm()
     return render(request, 'groups/create_group.html', {'form': form})
 
+
+@login_required
+def update_group(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
+
+    # Check if the current user is the owner of the group
+    if request.user != group.owner:
+        return HttpResponseForbidden("You are not allowed to change this group's details.")
+
+    if request.method == 'POST':
+        form = GroupForm(request.POST, instance=group)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Group details updated successfully.')
+            return redirect('groups:group_detail', group_id=group.id)
+    else:
+        form = GroupForm(instance=group)
+
+    return render(request, 'groups/update_group.html', {'form': form, 'group': group})
+
+
 def join_group(request, group_id):
     group = get_object_or_404(Group, id=group_id)
     

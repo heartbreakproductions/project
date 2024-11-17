@@ -9,4 +9,7 @@ body {
     font-family: "Didact Gothic", sans-serif;
 }
 
-
+.bio a {
+    color: #1E40AF;  /* Blue color for links */
+    text-decoration: underline;  /* Underline the links */
+}

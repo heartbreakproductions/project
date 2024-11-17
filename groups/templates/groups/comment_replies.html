@@ -1,6 +1,7 @@
 {% for reply in comment.replies.all %}
     <div class="pt-3 w-full">
-        <p><strong>{{ reply.user.username }}</strong>: 
+        <p>
+            <a href="{% url 'profile_view' reply.user.username %}"><strong>{{ reply.user.username }}</strong></a>: 
             {% with reply.content as content %}
                 {% for word in content.split %}
                     {% if word|slice:":1" == "@" %}

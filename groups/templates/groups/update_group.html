@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+  <div class="max-w-3xl mx-auto  p-3 bg-white shadow-lg">
+    <h2 class="text-2xl text-gray-800 mb-4">Update Group</h2>
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <div class="space-y-2">
+        {{ form.name|add_class:"block w-full border border-gray-300  p-2" }}
+        {{ form.description|add_class:"block w-full border border-gray-300  p-2" }}
+      </div>
+      <button type="submit" class="border px-2 py-1 w-full">
+        Update
+      </button>
+    </form>
+  </div>
+{% endblock %}

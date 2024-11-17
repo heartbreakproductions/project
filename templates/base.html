@@ -7,6 +7,7 @@
     <meta name="description" content="Onignou is a comprehensive, free community and forum platform dedicated to students of Indira Gandhi National Open University (IGNOU). It provides a collaborative space for students to ask questions, share information, engage in discussions, create groups, and stay updated with the latest news and announcements related to IGNOU. Additionally, Onignou offers a range of valuable services, including a job search feature, to support students in their academic and professional journeys.">
     <meta name="robots" content="index, follow">
     <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
 
     <title>{% block title %} Onignou {% endblock  %}</title>
 
@@ -31,11 +32,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Didact+Gothic&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/index.css' %}">
 
     {% comment %} summernote {% endcomment %}
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
+
+
+
+    <style>
+        .bio a {
+            color: #1E40AF; /* Blue color for links */
+        }
+
+    
+    </style>
+
 </head>
 <body>
     <header>

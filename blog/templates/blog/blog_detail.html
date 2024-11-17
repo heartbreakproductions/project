@@ -13,7 +13,7 @@
     {% endif %}
 
     <div class=" mx-auto">
-        <h1 class="text-xl  text-gray-800 mb-3">{{ blog.title }}</h1>
+        <h1 class="text-xl font-semibold text-gray-800 mb-2">{{ blog.title }}</h1>
         
         {% if blog.image and blog.image.url %}
         <div class="mb-1 h-[200px]">
@@ -24,7 +24,7 @@
     <h4 class="text-base">By {{ blog.author }}</h4>
     <h6 class="text-xs text-gray-800 mb-3">{{ blog.publish }}</h6>
     
-    <div class="blog-body text-gray-700 leading-relaxed mb-8">
+    <div class="blog-body text-gray-700 leading-relaxed mb-8 mt-9">
         {{ blog.body_html|safe }}
     </div>
 

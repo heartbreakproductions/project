@@ -9,7 +9,7 @@
 
     <!-- Post Metadata -->
     <p class="text-sm text-gray-500 mb-4">
-        Posted by <span class="font-medium">{{ post.author.username }}</span> on {{ post.created_at|date:"Y-m-d H:i" }}
+        Posted by <a class="underline" href="{% url 'profile_view' post.author.username %}" >{{ post.author.username }}</a> on {{ post.created_at|date:"Y-m-d H:i" }}
     </p>
 
     <div class="flex space-x-4 mb-6">
@@ -42,11 +42,11 @@
         {% for comment in top_level_comments %}
             <div class="mt-3 p-3 bg-gray-100 shadow-sm text-sm">
                 <div>
-                    <strong>{{ comment.user.username }}</strong>:
+                    <a href="{% url 'profile_view' comment.user.username %}"><strong>{{ comment.user.username }}</strong></a>:
                     {% with comment.content as content %}
                         {% for word in content.split %}
                             {% if word|slice:":1" == "@" %}
-                                <span class="text-blue-500 font-bold">{{ word }}</span>
+                                <span>{{ word }}</span>
                             {% else %}
                                 {{ word }}
                             {% endif %}

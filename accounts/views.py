@@ -8,7 +8,7 @@ from .models import UserProfile
 import os
 from posts.models import Post
 from django.contrib.auth.models import User
-
+import markdown
 
 # @login_required
 # def profile_view(request, username=None):
@@ -42,12 +42,92 @@ from django.contrib.auth.models import User
 #     }
 #     return render(request, 'accounts/profile.html', context)
 
-@login_required
-def profile_view(request):
-    user = request.user  # Automatically use the logged-in user
+# @login_required
+# def profile_view(request):
+#     user = request.user  # Automatically use the logged-in user
 
-    # Fetch or create the UserProfile for this user
+#     # Fetch or create the UserProfile for this user
+#     user_profile, created = UserProfile.objects.get_or_create(user=user)
+
+#     if request.method == 'POST':
+#         user_form = UserUpdateForm(request.POST, instance=user)
+#         profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=user_profile)
+
+#         if user_form.is_valid() and profile_form.is_valid():
+#             user_form.save()
+#             profile_form.save()
+#             messages.success(request, "Profile updated successfully!")
+#             return redirect('profile_view')  # Redirect to the user's profile
+
+#     else:
+#         user_form = UserUpdateForm(instance=user)
+#         profile_form = ProfileUpdateForm(instance=user_profile)
+
+#     context = {
+#         'user_form': user_form,
+#         'profile_form': profile_form,
+#         'user_profile': user_profile,
+#         'user': user,  # Passing the user to the template
+#     }
+#     return render(request, 'accounts/profile.html', context)
+
+# def profile_view(request, username):
+#     user = get_object_or_404(User, username=username)
+#     user_profile = get_object_or_404(UserProfile, user=user)
+#     return render(request, 'accounts/profile.html', {'user_profile': user_profile})
+
+
+# def profile_view(request, username=None):
+#     if not username:
+#         return redirect('profile_view', username=request.user.username)
+
+#     user = get_object_or_404(User, username=username)
+#     user_profile = get_object_or_404(UserProfile, user=user)
+
+#     # Convert markdown content to HTML (example markdown content)
+#     markdown_content = user_profile.bio  # assuming 'bio' is a field with markdown text
+#     user_profile.bio_html = markdown.markdown(markdown_content)
+
+#     return render(request, 'accounts/profile.html', {'user_profile': user_profile})
+
+
+# def profile_view(request, username=None):
+#     if not username:
+#         return redirect('profile_view', username=request.user.username)
+
+#     user = get_object_or_404(User, username=username)
+#     user_profile = get_object_or_404(UserProfile, user=user)
+
+#     # Safely handle `None` by using an empty string as a fallback
+#     markdown_content = user_profile.bio if user_profile.bio else ""
+#     user_profile.bio_html = markdown.markdown(markdown_content)
+
+#     return render(request, 'accounts/profile.html', {'user_profile': user_profile})
+
+
+def profile_view(request, username=None):
+    if not username:
+        return redirect('profile_view', username=request.user.username)
+
+    user = get_object_or_404(User, username=username)
+
+    # Use get_or_create to avoid 404 errors if UserProfile doesn't exist
     user_profile, created = UserProfile.objects.get_or_create(user=user)
+
+    # Safely handle `None` by using an empty string as a fallback
+    markdown_content = user_profile.bio if user_profile.bio else ""
+    user_profile.bio_html = markdown.markdown(markdown_content)
+
+    return render(request, 'accounts/profile.html', {'user_profile': user_profile})
+
+
+@login_required
+def profile_edit(request, username):
+    if request.user.username != username:
+        return redirect('profile_view', username=username)
+
+    user = get_object_or_404(User, username=username)
+    user_profile = get_object_or_404(UserProfile, user=user)
 
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, instance=user)
@@ -57,19 +137,17 @@ def profile_view(request):
             user_form.save()
             profile_form.save()
             messages.success(request, "Profile updated successfully!")
-            return redirect('profile_view')  # Redirect to the user's profile
-
+            return redirect('profile_view', username=username)
     else:
         user_form = UserUpdateForm(instance=user)
         profile_form = ProfileUpdateForm(instance=user_profile)
 
-    context = {
+    return render(request, 'accounts/profile_edit.html', {
         'user_form': user_form,
         'profile_form': profile_form,
         'user_profile': user_profile,
-        'user': user,  # Passing the user to the template
-    }
-    return render(request, 'accounts/profile.html', context)
+    })
+
 
 
 def register(request):
@@ -156,7 +234,7 @@ def delete_account(request):
         user.delete()
 
         messages.success(request, "Your account has been deleted.")
-        return redirect('home')  # Redirect to a suitable page after deletion
+        return redirect('posts:post_list')  # Redirect to a suitable page after deletion
 
     # If it's a GET request, show a confirmation page
     return render(request, 'accounts/delete_account.html')
