@@ -30,7 +30,7 @@
                 <h6 class=" text-gray-700 flex items-center space-x-2 ">
                     <!-- Display Profile Image if Available -->
                     {% if post.author.userprofile.profile_image %}
-                        <img src="{{ post.author.userprofile.profile_image.url }}" alt="{{ post.author.username }}'s Profile" class="w-10 h-10 rounded-full ">
+                        <img src="{{ post.author.userprofile.profile_image.url }}" alt="{{ post.author.username }}'s Profile" class="w-10 h-10 rounded-full  object-cover">
                     {% else %}
                         <img src="{% static 'images/user-fallback.png' %}" alt="{{ post.author.username }}'s Profile" class="w-10 h-10 rounded-full border"> <!-- Placeholder image if no profile image -->
                     {% endif %}

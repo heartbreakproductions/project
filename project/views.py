@@ -26,3 +26,7 @@ def donate_page(request):
     
 def about_page(request):
     return render(request, 'about_page.html')
+
+
+def links_page(request):
+    return render(request, 'links_page.html')

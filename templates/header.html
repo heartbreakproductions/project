@@ -90,6 +90,9 @@
 <div id="navbarModal" class="hidden z-50 bg-white h-auto w-full absolute overflow-x-hidden shadow-xl">
     
     <div class="p-4 space-y-1">
+
+        
+
         <div class="flex justify-between gap-1 flex-wrap">
 
             <a href="{% url 'posts:post_list' %}" class="space-x-1 px-[2px] py-[4px] border flex-auto text-center active:bg-gray-200">
@@ -109,6 +112,10 @@
                 <i class="bi bi-gear relative top-[1px]"></i>
             </a>
         </div>
+
+        
+
+
         <div class="flex justify-between flex-wrap gap-1">
 
             <a href="{% url 'jobs:job_list' %}" class="space-x-1 px-[2px] py-[4px] border flex-auto text-center active:bg-gray-200">
@@ -125,6 +132,17 @@
             </a>
             
         </div>
+
+
+        <div class="flex justify-between flex-wrap gap-1">
+
+            <a href="{% url 'chat' %}" class="space-x-1 px-[2px] py-[4px] border flex-auto text-center active:bg-gray-200">
+                <span>Chat</span> 
+                <i class="bi bi-chat-dots"></i>
+            </a>
+            
+        </div>
+        
     </div>
 </div>
 

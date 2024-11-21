@@ -4,11 +4,10 @@
 <div>
     <div class="max-w-2xl mx-auto p-3 sm:p-6 bg-white shadow-lg">
 
-
         <!-- Display the Author's Profile Image -->
         <div class="flex items-center gap-2 mb-4">
             {% if post.author.userprofile.profile_image %}
-                <img src="{{ post.author.userprofile.profile_image.url }}" alt="{{ post.author.username }}'s profile image" class="w-10 h-10 rounded-full border">
+                <img src="{{ post.author.userprofile.profile_image.url }}" alt="{{ post.author.username }}'s profile image" class="w-10 h-10 rounded-full border object-cover">
             {% else %}
                 <img src="{% static 'images/user-fallback.png' %}" alt="Default Avatar" class="w-10 h-10 rounded-full border">
             {% endif %}

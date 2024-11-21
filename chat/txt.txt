@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="bg-white shadow-md p-2">
+    <!-- Chat Box -->
+    <div id="chat-box" class="h-[500px] overflow-y-scroll">
+        {% for message in messages %}
+        <div id="message-{{ message.id }}" class="mb-5 border p-2">
+            <!-- User Info Section -->
+            <a href="{% url 'profile_view' message.user.username %}" class="flex items-center space-x-2">
+                {% if message.user.userprofile.profile_image %}
+                <img class="h-[40px] w-[40px] rounded-full border object-cover" src="{{ message.user.userprofile.profile_image.url }}" alt="Profile Picture">
+                {% else %}
+                <img class="h-[40px] w-[40px] rounded-full border" src="{% static 'images/user-fallback.png' %}" alt="Profile Picture">
+                {% endif %}
+                <h3>@{{ message.user.username }}</h3>
+            </a>
+
+            <!-- Message Content -->
+            <div class="my-2">
+                <p>
+                    {{ message.content|addslashes|safe|linebreaksbr }}
+                </p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-x-2 text-gray-500 text-sm">
+                <button onclick="replyTo('{{ message.user.username }}')">Reply</button>
+                {% if message.user == request.user %}
+                <button onclick="deleteMessage('{{ message.id }}')">Delete</button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Message Input Section -->
+    <div class="flex justify-between mt-4 space-x-2">
+        <input type="text" class="border px-2 py-1 w-full" id="message-input" placeholder="Message..." />
+        <button id="send-button" class="px-4 py-1 border">Send</button>
+    </div>
+</div>
+
+<script>
+    const ws = new WebSocket('ws://' + window.location.host + '/ws/chat/');
+    let replyingToUsername = null;
+
+    function scrollToBottom() {
+        const chatBox = document.getElementById('chat-box');
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    window.onload = scrollToBottom;
+
+    ws.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+
+        if (data.action === "delete") {
+            const messageDiv = document.getElementById("message-" + data.message_id);
+            if (messageDiv) {
+                messageDiv.remove();
+            }
+        } else if (data.action === "new_message") {
+            const chatBox = document.getElementById('chat-box');
+            const newMessageDiv = document.createElement('div');
+            newMessageDiv.id = 'message-' + data.message_id;
+            newMessageDiv.className = 'mb-5 border p-2';
+
+            const profileImageHtml = data.profile_image_url
+                ? `<img class="h-[40px] w-[40px] rounded-full border object-cover" src="${data.profile_image_url}" alt="Profile Picture">`
+                : `<img class="h-[40px] w-[40px] rounded-full border" src="/static/images/user-fallback.png" alt="Profile Picture">`;
+
+            // Highlight @username within the message content
+            const highlightedMessage = data.message.replace(
+                /@(\w+)/g,
+                '<span class="text-red-500">@$1</span>'
+            );
+
+            newMessageDiv.innerHTML = `
+    <div class="flex items-center space-x-2">
+        <a href="/profile/${data.user}/" class="flex items-center space-x-2">
+            ${profileImageHtml}
+            <h3>@${data.user}</h3>
+        </a>
+    </div>
+    <div class="my-2">
+        <p>${highlightedMessage}</p>
+    </div>
+    <div class="space-x-2 text-gray-500 text-sm">
+        <button onclick="replyTo('${data.user}')">Reply</button>
+        ${data.is_user_message ? `<button onclick="deleteMessage('${data.message_id}')">Delete</button>` : ''}
+    </div>
+`;
+            chatBox.appendChild(newMessageDiv);
+            scrollToBottom();
+        }
+    };
+
+    document.getElementById('send-button').onclick = function () {
+        const messageInput = document.getElementById('message-input');
+        let message = messageInput.value.trim();
+        if (replyingToUsername) {
+            message = `@${replyingToUsername} ${message}`;
+        }
+
+        if (message) {
+            ws.send(JSON.stringify({ message }));
+            messageInput.value = '';
+            replyingToUsername = null;
+            messageInput.placeholder = 'Type a message...';
+        }
+    };
+
+    function deleteMessage(messageId) {
+        ws.send(JSON.stringify({ delete_message_id: messageId }));
+    }
+
+    function replyTo(username) {
+        replyingToUsername = username;
+        const messageInput = document.getElementById('message-input');
+        messageInput.placeholder = `Replying to @${username}`;
+        messageInput.focus();
+    }
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import json
+from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
+from .models import Message
+
+class ChatConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.room_name = "global_chat"
+        self.room_group_name = f'chat_{self.room_name}'
+        self.user = self.scope['user']
+
+        if not self.user.is_authenticated:
+            await self.close()
+            return
+
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    # async def receive(self, text_data):
+    #     data = json.loads(text_data)
+    #     message_content = data.get('message', '').strip()
+    #     delete_message_id = data.get('delete_message_id', None)
+
+    #     if delete_message_id:
+    #         await self.delete_message(delete_message_id)
+    #         return
+
+    #     new_message = await self.create_message(
+    #         user=self.user,
+    #         content=message_content,
+    #     )
+
+    #     profile_image_url = await self.get_profile_image_url(self.user)
+
+    #     await self.channel_layer.group_send(
+    #         self.room_group_name,
+    #         {
+    #             'type': 'chat_message',
+    #             'message_id': new_message.id,
+    #             'message': new_message.content,
+    #             'user': self.user.username,
+    #             'profile_image_url': profile_image_url,
+    #         }
+    #     )
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        message_content = data.get('message', '').strip()
+        delete_message_id = data.get('delete_message_id', None)
+
+        # Handle message deletion
+        if delete_message_id:
+            await self.delete_message(delete_message_id)
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'action': 'delete',
+                    'message_id': delete_message_id,
+                }
+            )
+            return
+
+        # Handle new message creation
+        if message_content:
+            new_message = await self.create_message(user=self.user, content=message_content)
+            profile_image_url = await self.get_profile_image_url(self.user)
+
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'action': 'new_message',
+                    'message_id': new_message.id,
+                    'message': new_message.content,
+                    'user': self.user.username,
+                    'profile_image_url': profile_image_url,
+                    'is_user_message': True,
+                }
+            )
+
+    # async def chat_message(self, event):
+    #     await self.send(text_data=json.dumps(event))
+
+    async def chat_message(self, event):
+        """
+        Broadcast messages or deletions to WebSocket clients.
+        """
+        await self.send(text_data=json.dumps(event))
+
+
+    @database_sync_to_async
+    def create_message(self, user, content):
+        return Message.objects.create(user=user, content=content)
+
+    @database_sync_to_async
+    def delete_message(self, message_id):
+        try:
+            message = Message.objects.get(id=message_id)
+            message.delete()
+        except Message.DoesNotExist:
+            pass
+
+    @database_sync_to_async
+    def get_profile_image_url(self, user):
+        if hasattr(user, 'userprofile') and user.userprofile.profile_image:
+            return user.userprofile.profile_image.url
+        return '/static/images/user-fallback.png'

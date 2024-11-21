@@ -37,7 +37,7 @@
     <!-- Show Edit Link if User is the Account Owner -->
     {% if user_profile.user == request.user %}
         <div class="mt-4">
-            <a href="{% url 'profile_edit' username=user_profile.user.username  %}" class="text-blue-500">Edit Profile</a>
+            <a href="{% url 'profile_edit' username=user_profile.user.username  %}" class="px-2 py-1 border">Edit Profile</a>
         </div>
     {% endif %}
 </div>

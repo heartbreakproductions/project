@@ -9,7 +9,7 @@
     {% if user_profile.profile_image %}
     <div class="mt-4">
         <label class="block text-gray-700 font-medium">Profile Image</label>
-        <img src="{{ user_profile.profile_image.url }}" alt="Profile Image" class="w-32 h-32 border mt-2">
+        <img src="{{ user_profile.profile_image.url }}" alt="Profile Image" class="w-32 h-32 border mt-2 object-contain">
     </div>
     {% else %}
     <div class="mt-4">

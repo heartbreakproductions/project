@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'daphne',
     'django.contrib.staticfiles',
     'accounts',
     'posts',
@@ -69,8 +70,22 @@ INSTALLED_APPS = [
     'notifications',
     # 'widget_tweaks',
     'django_recaptcha',
+    'channels', 
+    'chat', 
 
 ]
+
+ASGI_APPLICATION = 'project.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('onignou.in', 6379)],
+        },
+    },
+}
+
 
 INSTALLED_APPS += [
     'widget_tweaks',
